@@ -12,6 +12,7 @@ import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 public class MainActivity extends Activity implements OnClickListener {
 
@@ -24,8 +25,6 @@ public class MainActivity extends Activity implements OnClickListener {
     public static final String PREFS_NAME = "Gargoyle";
 
     private static SharedPreferences mSettings;
-    
-    private String token;
 
     private ProgressDialog mProgress;
 
@@ -79,6 +78,9 @@ public class MainActivity extends Activity implements OnClickListener {
         EditText usernameEditText = (EditText) findViewById(R.id.txt_username);
 
         EditText passwordEditText = (EditText) findViewById(R.id.txt_password);
+        
+        TextView uptime = (TextView) findViewById(R.id.textView3);
+        TextView hostname = (TextView) findViewById(R.id.textView4);
 
         // the getText() gets the current value of the text box
 
@@ -104,9 +106,12 @@ public class MainActivity extends Activity implements OnClickListener {
             Log.i(DEB_TAG, "Username: " + sUserName + "nPassword: " + sPassword);
 
             LuciRpcClient client = new LuciRpcClient();
-            String token = client.Auth();
-            Log.v(DEB_TAG, token);
-
+            client.connect(SERVER_HOST+":"+SERVER_PORT, sUserName, sPassword);
+            String testValue = client.Sys("uptime");
+            uptime.setText(testValue);
+            testValue = client.Sys("hostname");
+            hostname.setText(testValue);
+            testValue = client.Net("net.deviceinfo");
             mProgress.dismiss();
 
             SharedPreferences.Editor editor = mSettings.edit();
@@ -138,17 +143,6 @@ public class MainActivity extends Activity implements OnClickListener {
         // startActivityForResult(myIntent, 0);
     }
 
-    public static String server() {
-        return SERVER_HOST+":"+SERVER_PORT;
-    }
-
-    public static Object user() {
-        return mSettings.getString("Login", "");
-    }
-
-    public static Object pass() {
-        return mSettings.getString("Password", "");
-    }
 
 
 }
