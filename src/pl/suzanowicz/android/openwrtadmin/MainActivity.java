@@ -1,11 +1,9 @@
 
-package pl.suzanowicz.android.gargoyleadmin;
+package pl.suzanowicz.android.openwrtadmin;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import pl.suzanowicz.android.openwrtadmin.R;
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,11 +19,13 @@ public class MainActivity extends Activity implements OnClickListener {
 
     private static final String DEB_TAG = "Json_Android";
 
-    private String SERVER_HOST = "home.suzanowicz.pl";
+    private static String SERVER_HOST = "188.116.32.34";
 
     public static final String PREFS_NAME = "Gargoyle";
 
-    private SharedPreferences mSettings;
+    private static SharedPreferences mSettings;
+    
+    private String token;
 
     private ProgressDialog mProgress;
 
@@ -90,13 +90,6 @@ public class MainActivity extends Activity implements OnClickListener {
 
         String sPassword = passwordEditText.getText().toString();
 
-        // call the backend using Get parameters (discouraged but works good for
-        // this exampl <img
-        // src="http://www.instropy.com/wp-includes/images/smilies/icon_wink.gif"
-        // alt=";)" class="wp-smiley"> )
-
-        String address = "http://" + SERVER_HOST + ":" + SERVER_PORT
-                + "/jbackend.php?action=login&Login=" + sUserName + "&Password=" + sPassword + "";
 
         if (usernameEditText == null || passwordEditText == null) {
             // show some warning
@@ -110,9 +103,9 @@ public class MainActivity extends Activity implements OnClickListener {
 
             Log.i(DEB_TAG, "Username: " + sUserName + "nPassword: " + sPassword);
 
-            Log.i(DEB_TAG, "Requesting to " + address);
-
-            JSONObject json = RestJsonClient.connect(address);
+            LuciRpcClient client = new LuciRpcClient();
+            String token = client.Auth();
+            Log.v(DEB_TAG, token);
 
             mProgress.dismiss();
 
@@ -144,5 +137,18 @@ public class MainActivity extends Activity implements OnClickListener {
         // LoggedActivity.class);
         // startActivityForResult(myIntent, 0);
     }
+
+    public static String server() {
+        return SERVER_HOST+":"+SERVER_PORT;
+    }
+
+    public static Object user() {
+        return mSettings.getString("Login", "");
+    }
+
+    public static Object pass() {
+        return mSettings.getString("Password", "");
+    }
+
 
 }
